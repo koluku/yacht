@@ -3,6 +3,7 @@ package yahtzee
 import (
 	"math/rand"
 	"sort"
+	"time"
 
 	"github.com/samber/lo"
 )
@@ -40,21 +41,22 @@ func NewDice(id int) *Dice {
 	}
 }
 
-func (d *Dice) Roll(seed int64) {
-	rand.Seed(seed)
+func (d *Dice) Roll() {
+	rand.Seed(time.Now().UnixNano())
 	number := rand.Intn(5) + 1
 	d.Number = number
 	d.Emoji = DiceEmojiMap[number]
+	d.Status = DiceStatusRolled
 }
 
 type Dices []*Dice
 
-func (ds Dices) Rolls(seed int64) {
+func (ds Dices) Rolls() {
 	for _, dice := range ds {
 		if dice.Status != DiceStatusReady {
 			continue
 		}
-		dice.Roll(seed)
+		dice.Roll()
 	}
 }
 
@@ -132,9 +134,9 @@ func (db DiceBox) PickedNum() int {
 	return num
 }
 
-func (db *DiceBox) Roll(seed int64) {
+func (db *DiceBox) Roll() {
 	db.Dices.Clear()
-	db.Dices.Rolls(seed)
+	db.Dices.Rolls()
 	db.RolledTimes++
 }
 

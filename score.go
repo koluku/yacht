@@ -35,33 +35,7 @@ type Score struct {
 }
 
 func NewScore() *Score {
-	return &Score{
-		Ace:           0,
-		Twos:          0,
-		Threes:        0,
-		Fours:         0,
-		Fives:         0,
-		Sixes:         0,
-		Choice:        0,
-		FourOfAKind:   0,
-		FullHouse:     0,
-		SmallStraight: 0,
-		BigStraight:   0,
-		Yahtzee:       0,
-
-		IsFilledAce:           false,
-		IsFilledTwos:          false,
-		IsFilledThrees:        false,
-		IsFilledFours:         false,
-		IsFilledFives:         false,
-		IsFilledSixes:         false,
-		IsFilledChoice:        false,
-		IsFilledFourOfAKind:   false,
-		IsFilledFullHouse:     false,
-		IsFilledSmallStraight: false,
-		IsFilledBigStraight:   false,
-		IsFilledYahtzee:       false,
-	}
+	return &Score{}
 }
 
 func (s *Score) FillAce(point int) error {

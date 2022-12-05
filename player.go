@@ -42,6 +42,10 @@ func (ps *Players) Shuffle() {
 	}
 }
 
+func (ps *Players) First() *Player {
+	return ps.Players[0]
+}
+
 func (ps *Players) Next() *Player {
 	next := ps.Current + 1
 	if next > len(ps.Players)-1 {

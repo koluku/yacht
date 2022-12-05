@@ -1,13 +1,11 @@
 package yahtzee
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type Turn struct {
 	Current int
 	Player  *Player
-	Phase   PhaseType
+	Phase   *Phase
 	DiceBox *DiceBox
 }
 
@@ -15,15 +13,14 @@ func NewTurn(player *Player, current int) *Turn {
 	return &Turn{
 		Player:  player,
 		Current: current,
-		Phase:   PhaseTypeBegin,
-		DiceBox: NewDiceBox(5),
+		Phase:   NewPhase(),
 	}
 }
 
 type PhaseType int
 
 const (
-	PhaseTypeBegin PhaseType = iota
+	PhaseTypeStandby PhaseType = iota
 	PhaseTypeRoll
 	PhaseTypePick
 	PhaseTypeScoring
@@ -31,85 +28,135 @@ const (
 )
 
 type Phase struct {
-	Turn    int
-	Player  *Player
 	Type    PhaseType
 	DiceBox *DiceBox
 }
 
-func (t *Turn) NextPhase() error {
-	var err error = nil
-	switch t.Phase {
-	case PhaseTypeBegin:
-		t.MoveRollPhase()
-	case PhaseTypeRoll:
-		if !t.CanMovePickPhase() {
-			err = fmt.Errorf("サイコロを振っていない場合は残すサイコロを決めることができない")
-			break
-		}
-		// t.PickPhase()
-	case PhaseTypePick:
-		if !t.CanMoveScoringPhase() {
-			err = fmt.Errorf("残すサイコロが5つない場合はスコアを付けることができない")
-			break
-		}
-		// t.ScoringPhase()
-	case PhaseTypeScoring:
-		if !t.CanMoveEndPhase() {
-			err = fmt.Errorf("役からスコアをつけなかったら終わらせることができない")
-			break
-		}
-		// t.EndPhase()
-	case PhaseTypeEnd:
-		err = fmt.Errorf("既にターンが終わっているので次のフェイズに移行できない")
+func NewPhase() *Phase {
+	return &Phase{
+		Type:    PhaseTypeStandby,
+		DiceBox: NewDiceBox(5),
 	}
-	return err
 }
 
-func (t *Turn) MoveRollPhase() {
-	t.Phase = PhaseTypeRoll
+func (p *Phase) Next() error {
+	switch p.Type {
+	case PhaseTypeStandby:
+		p.MoveRollPhase()
+		return nil
+	case PhaseTypeRoll:
+		if !p.CanMovePickPhase() {
+			return fmt.Errorf("サイコロを振っていない場合は残すサイコロを決めることができない")
+		}
+		p.MovePickPhase()
+		return nil
+	case PhaseTypePick:
+		if !p.CanMoveScoringPhase() {
+			return fmt.Errorf("サイコロを5つ決めていない場合はスコアを確定させることができない")
+		}
+		p.MoveScoringPhase()
+		return nil
+	case PhaseTypeScoring:
+		p.MoveEndPhase()
+	case PhaseTypeEnd:
+		return fmt.Errorf("終わってるよ！！")
+	}
+	return nil
 }
 
-func (t *Turn) RollDice(seed int64) {
-	t.DiceBox.Roll(seed)
+func (p *Phase) MoveRollPhase() {
+	p.Type = PhaseTypeRoll
 }
 
-func (t *Turn) CanMoveRollPhase() bool {
-	return t.DiceBox.RolledTimes < 3
+func (p *Phase) CanMovePickPhase() bool {
+	return p.DiceBox.RolledNum() > 0
 }
 
-func (t *Turn) IsRollPhase() bool {
-	return t.Phase == PhaseTypeRoll
+func (p *Phase) MovePickPhase() {
+	p.Type = PhaseTypePick
 }
 
-func (t *Turn) MovePickPhase() {
-	t.Phase = PhaseTypePick
+func (p *Phase) CanMoveScoringPhase() bool {
+	return p.DiceBox.PickedNum() == 5
 }
 
-func (t *Turn) PickDice(ids []int) {
-	// t.DiceBox.Pick(ids)
+func (p *Phase) MoveScoringPhase() {
+	p.Type = PhaseTypeScoring
 }
 
-func (t *Turn) CanMovePickPhase() bool {
-	return t.DiceBox.ReadyNum() == 0
+func (p *Phase) MoveEndPhase() {
+	p.Type = PhaseTypeEnd
 }
 
-func (t *Turn) ScoringPhase() {
-	t.Phase = PhaseTypeScoring
-}
+// func (t *Turn) NextPhase() error {
+// 	var err error = nil
+// 	switch p {
+// 	case PhaseTypeStandby:
+// 		t.MoveRollPhase()
+// 	case PhaseTypeRoll:
+// 		if !t.CanMovePickPhase() {
+// 			err = fmt.Errorf("サイコロを振っていない場合は残すサイコロを決めることができない")
+// 			break
+// 		}
+// 		// t.PickPhase()
+// 	case PhaseTypePick:
+// 		if !t.CanMoveScoringPhase() {
+// 			err = fmt.Errorf("残すサイコロが5つない場合はスコアを付けることができない")
+// 			break
+// 		}
+// 		// t.ScoringPhase()
+// 	case PhaseTypeScoring:
+// 		if !t.CanMoveEndPhase() {
+// 			err = fmt.Errorf("役からスコアをつけなかったら終わらせることができない")
+// 			break
+// 		}
+// 		// t.EndPhase()
+// 	case PhaseTypeEnd:
+// 		err = fmt.Errorf("既にターンが終わっているので次のフェイズに移行できない")
+// 	}
+// 	return err
+// }
 
-func (t *Turn) CanMoveScoringPhase() bool {
-	return true
-}
+// func (t *Turn) MoveRollPhase() {
+// 	t.Phase = PhaseTypeRoll
+// }
 
-func (t *Turn) MoveEndPhase() {
-	t.Phase = PhaseTypeEnd
-}
+// func (t *Turn) RollDice(seed int64) {
+// 	t.DiceBox.Roll(seed)
+// }
 
-func (t *Turn) CanMoveEndPhase() bool {
-	return true
-}
+// func (t *Turn) CanMoveRollPhase() bool {
+// 	return t.DiceBox.RolledTimes < 3
+// }
 
-func (t *Turn) IsCompleted() bool {
-	return t.Phase == PhaseTypeEnd
+// func (t *Turn) IsRollPhase() bool {
+// 	return t.Phase == PhaseTypeRoll
+// }
+
+// func (t *Turn) MovePickPhase() {
+// 	t.Phase = PhaseTypePick
+// }
+
+// func (t *Turn) PickDice(ids []int) {
+// 	// t.DiceBox.Pick(ids)
+// }
+
+// func (t *Turn) ScoringPhase() {
+// 	t.Phase = PhaseTypeScoring
+// }
+
+// func (t *Turn) CanMoveScoringPhase() bool {
+// 	return true
+// }
+
+// func (t *Turn) MoveEndPhase() {
+// 	t.Phase = PhaseTypeEnd
+// }
+
+// func (t *Turn) CanMoveEndPhase() bool {
+// 	return true
+// }
+
+func (t *Turn) IsEnded() bool {
+	return t.Phase.Type == PhaseTypeEnd
 }
