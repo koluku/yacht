@@ -3,10 +3,20 @@ package yahtzee
 import (
 	"math/rand"
 	"sort"
+
+	"github.com/samber/lo"
+)
+
+type DiceStatus int
+
+const (
+	DiceStatusReady DiceStatus = iota
+	DiceStatusRolled
+	DiceStatusPicked
 )
 
 var (
-	Pips = map[int]string{
+	DiceEmojiMap = map[int]string{
 		1: "⚀",
 		2: "⚁",
 		3: "⚂",
@@ -17,34 +27,52 @@ var (
 )
 
 type Dice struct {
+	ID     int
 	Number int
-	Pip    string
+	Emoji  string
+	Status DiceStatus
 }
 
-func NewDice() *Dice {
-	return &Dice{}
+func NewDice(id int) *Dice {
+	return &Dice{
+		ID:     id,
+		Status: DiceStatusReady,
+	}
 }
 
 func (d *Dice) Roll(seed int64) {
 	rand.Seed(seed)
 	number := rand.Intn(5) + 1
 	d.Number = number
-	d.Pip = Pips[number]
+	d.Emoji = DiceEmojiMap[number]
 }
 
 type Dices []*Dice
 
-func NewDices(num int) Dices {
-	dices := Dices{}
-	for i := 0; i < num; i++ {
-		dices = append(dices, NewDice())
+func (ds Dices) Rolls(seed int64) {
+	for _, dice := range ds {
+		if dice.Status != DiceStatusReady {
+			continue
+		}
+		dice.Roll(seed)
 	}
-	return dices
 }
 
-func (ds Dices) Roll(seed int64) {
+func (ds Dices) Picks(ids []int) {
 	for _, dice := range ds {
-		dice.Roll(seed)
+		if lo.Contains(ids, dice.ID) {
+			dice.Status = DiceStatusPicked
+		}
+	}
+}
+
+// Pick以外のサイコロをReadyに戻す
+func (ds Dices) Clear() {
+	for _, dice := range ds {
+		if dice.Status == DiceStatusPicked {
+			continue
+		}
+		dice.Status = DiceStatusReady
 	}
 }
 
@@ -60,16 +88,56 @@ func (ds Dices) Open() []int {
 }
 
 type DiceBox struct {
-	// 振る前のサイコロ
-	ReadyDices Dices
-	// 振った後のサイコロ
-	RolledDices Dices
-	// 確定済みのサイコロ
-	PickedDices Dices
+	Dices       Dices
+	RolledTimes int
 }
 
-func NewDiceBox(num int) DiceBox {
-	return DiceBox{
-		ReadyDices: NewDices(num),
+func NewDiceBox(num int) *DiceBox {
+	dices := Dices{}
+	for i := 0; i < num; i++ {
+		dices = append(dices, NewDice(i))
 	}
+	return &DiceBox{
+		Dices: dices,
+	}
+}
+
+func (db DiceBox) ReadyNum() int {
+	var num int
+	for _, dice := range db.Dices {
+		if dice.Status == DiceStatusReady {
+			num++
+		}
+	}
+	return num
+}
+
+func (db DiceBox) RolledNum() int {
+	var num int
+	for _, dice := range db.Dices {
+		if dice.Status == DiceStatusRolled {
+			num++
+		}
+	}
+	return num
+}
+
+func (db DiceBox) PickedNum() int {
+	var num int
+	for _, dice := range db.Dices {
+		if dice.Status == DiceStatusPicked {
+			num++
+		}
+	}
+	return num
+}
+
+func (db *DiceBox) Roll(seed int64) {
+	db.Dices.Clear()
+	db.Dices.Rolls(seed)
+	db.RolledTimes++
+}
+
+func (db *DiceBox) Pick(ids []int) {
+	db.Dices.Picks(ids)
 }
