@@ -1,4 +1,4 @@
-module github.com/koluku/yahtzee
+module github.com/koluku/yacht
 
 go 1.18
 

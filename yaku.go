@@ -1,4 +1,4 @@
-package yahtzee
+package yacht
 
 import (
 	"sort"
@@ -11,18 +11,18 @@ const (
 )
 
 type Yaku struct {
-	Ace           int
-	Twos          int
-	Threes        int
-	Fours         int
-	Fives         int
-	Sixes         int
-	Choice        int
-	FourOfAKind   int
-	FullHouse     int
-	SmallStraight int
-	BigStraight   int
-	Yahtzee       int
+	Ace            int
+	Twos           int
+	Threes         int
+	Fours          int
+	Fives          int
+	Sixes          int
+	Choice         int
+	FourOfAKind    int
+	FullHouse      int
+	LittleStraight int
+	BigStraight    int
+	Yacht          int
 }
 
 func (y *Yaku) Calculate(dices []int) {
@@ -35,9 +35,9 @@ func (y *Yaku) Calculate(dices []int) {
 	y.Choice = Choice(dices)
 	y.FourOfAKind = FourOfAKind(dices)
 	y.FullHouse = FullHouse(dices)
-	y.SmallStraight = SmallStraight(dices)
+	y.LittleStraight = LittleStraight(dices)
 	y.BigStraight = BigStraight(dices)
-	y.Yahtzee = Yahtzee(dices)
+	y.Yacht = Yacht(dices)
 }
 
 // 任意の組み合わせ(１の目の合計)
@@ -164,7 +164,7 @@ func FullHouse(dices []int) int {
 }
 
 // ４つ以上の目が連続している(15点)
-func SmallStraight(dices []int) int {
+func LittleStraight(dices []int) int {
 	sort.Ints(dices)
 	stack := [][]int{dices[0:4], dices[1:5]}
 	var ok bool
@@ -200,7 +200,7 @@ func BigStraight(dices []int) int {
 }
 
 // ５つの目がすべて同じ(50点)
-func Yahtzee(dices []int) int {
+func Yacht(dices []int) int {
 	groups := lo.GroupBy(dices, func(i int) int {
 		return i
 	})

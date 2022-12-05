@@ -1,4 +1,4 @@
-package yahtzee
+package yacht
 
 import (
 	"testing"
@@ -252,7 +252,7 @@ func TestFullHouse(t *testing.T) {
 	}
 }
 
-func TestSmallStraight(t *testing.T) {
+func TestLittleStraight(t *testing.T) {
 	cases := []struct {
 		name   string
 		dices  []int
@@ -286,7 +286,7 @@ func TestSmallStraight(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			value := SmallStraight(tt.dices)
+			value := LittleStraight(tt.dices)
 			if value != tt.expect {
 				t.Errorf("value test failed, expect: %v, value: %v", tt.expect, value)
 			}
@@ -336,7 +336,7 @@ func TestBigStraight(t *testing.T) {
 	}
 }
 
-func TestYahtzee(t *testing.T) {
+func TestYacht(t *testing.T) {
 	cases := []struct {
 		name   string
 		dices  []int
@@ -360,7 +360,7 @@ func TestYahtzee(t *testing.T) {
 	}
 	for _, tt := range cases {
 		t.Run(tt.name, func(t *testing.T) {
-			value := Yahtzee(tt.dices)
+			value := Yacht(tt.dices)
 			if value != tt.expect {
 				t.Errorf("value test failed, expect: %v, value: %v", tt.expect, value)
 			}

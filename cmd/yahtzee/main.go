@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/koluku/yahtzee"
+	"github.com/koluku/yacht"
 )
 
 func main() {
@@ -14,13 +14,13 @@ func main() {
 }
 
 func play() error {
-	players := yahtzee.NewPlayers()
-	me := yahtzee.NewPlayer("me")
-	bot := yahtzee.NewPlayer("bot")
+	players := yacht.NewPlayers()
+	me := yacht.NewPlayer("me")
+	bot := yacht.NewPlayer("bot")
 	players.Add(me)
 	players.Add(bot)
 
-	game := yahtzee.NewGame(players)
+	game := yacht.NewGame(players)
 
 	for !game.IsEnded() {
 		turn, err := game.NextTurn()
@@ -29,28 +29,28 @@ func play() error {
 		}
 		phase := turn.Phase
 
-		if phase.Type == yahtzee.PhaseTypeStandby {
+		if phase.Type == yacht.PhaseTypeStandby {
 			if err := phase.Next(); err != nil {
 				return err
 			}
 		}
-		if phase.Type == yahtzee.PhaseTypeRoll {
+		if phase.Type == yacht.PhaseTypeRoll {
 			phase.DiceBox.Roll()
 			if err := phase.Next(); err != nil {
 				return err
 			}
 		}
-		if phase.Type == yahtzee.PhaseTypePick {
+		if phase.Type == yacht.PhaseTypePick {
 			phase.DiceBox.Pick([]int{0, 1, 2, 3, 4})
 			if err := phase.Next(); err != nil {
 				return err
 			}
 		}
-		if phase.Type == yahtzee.PhaseTypeScoring {
-			yaku := &yahtzee.Yaku{}
+		if phase.Type == yacht.PhaseTypeScoring {
+			yaku := &yacht.Yaku{}
 			yaku.Calculate(phase.DiceBox.Dices.Open())
 
-			var currentPlayer *yahtzee.Player
+			var currentPlayer *yacht.Player
 			if turn.Current%2 == 1 {
 				currentPlayer = me
 			} else {
@@ -103,8 +103,8 @@ func play() error {
 					return err
 				}
 			case turn.Current > 18 && turn.Current <= 20:
-				fmt.Println("SmallStraight")
-				if err := currentPlayer.Score.FillSmallStraight(yaku.SmallStraight); err != nil {
+				fmt.Println("LittleStraight")
+				if err := currentPlayer.Score.FillLittleStraight(yaku.LittleStraight); err != nil {
 					return err
 				}
 			case turn.Current > 20 && turn.Current <= 22:
@@ -113,8 +113,8 @@ func play() error {
 					return err
 				}
 			case turn.Current > 22 && turn.Current <= 24:
-				fmt.Println("Yahtzee")
-				if err := currentPlayer.Score.FillYahtzee(yaku.Yahtzee); err != nil {
+				fmt.Println("Yacht")
+				if err := currentPlayer.Score.FillYacht(yaku.Yacht); err != nil {
 					return err
 				}
 			default:

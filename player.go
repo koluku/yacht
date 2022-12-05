@@ -1,4 +1,4 @@
-package yahtzee
+package yacht
 
 import (
 	"github.com/samber/lo"

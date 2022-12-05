@@ -1,4 +1,4 @@
-package yahtzee
+package yacht
 
 import (
 	"fmt"
@@ -7,31 +7,31 @@ import (
 )
 
 type Score struct {
-	Ace           int
-	Twos          int
-	Threes        int
-	Fours         int
-	Fives         int
-	Sixes         int
-	Choice        int
-	FourOfAKind   int
-	FullHouse     int
-	SmallStraight int
-	BigStraight   int
-	Yahtzee       int
+	Ace            int
+	Twos           int
+	Threes         int
+	Fours          int
+	Fives          int
+	Sixes          int
+	Choice         int
+	FourOfAKind    int
+	FullHouse      int
+	LittleStraight int
+	BigStraight    int
+	Yacht          int
 
-	IsFilledAce           bool
-	IsFilledTwos          bool
-	IsFilledThrees        bool
-	IsFilledFours         bool
-	IsFilledFives         bool
-	IsFilledSixes         bool
-	IsFilledChoice        bool
-	IsFilledFourOfAKind   bool
-	IsFilledFullHouse     bool
-	IsFilledSmallStraight bool
-	IsFilledBigStraight   bool
-	IsFilledYahtzee       bool
+	IsFilledAce            bool
+	IsFilledTwos           bool
+	IsFilledThrees         bool
+	IsFilledFours          bool
+	IsFilledFives          bool
+	IsFilledSixes          bool
+	IsFilledChoice         bool
+	IsFilledFourOfAKind    bool
+	IsFilledFullHouse      bool
+	IsFilledLittleStraight bool
+	IsFilledBigStraight    bool
+	IsFilledYacht          bool
 }
 
 func NewScore() *Score {
@@ -119,12 +119,12 @@ func (s *Score) FillFullHouse(point int) error {
 	return nil
 }
 
-func (s *Score) FillSmallStraight(point int) error {
-	if s.IsFilledSmallStraight {
+func (s *Score) FillLittleStraight(point int) error {
+	if s.IsFilledLittleStraight {
 		return fmt.Errorf("既に埋めてあるよ")
 	}
-	s.SmallStraight = point
-	s.IsFilledSmallStraight = true
+	s.LittleStraight = point
+	s.IsFilledLittleStraight = true
 	return nil
 }
 
@@ -137,12 +137,12 @@ func (s *Score) FillBigStraight(point int) error {
 	return nil
 }
 
-func (s *Score) FillYahtzee(point int) error {
-	if s.IsFilledYahtzee {
+func (s *Score) FillYacht(point int) error {
+	if s.IsFilledYacht {
 		return fmt.Errorf("既に埋めてあるよ")
 	}
-	s.Yahtzee = point
-	s.IsFilledYahtzee = true
+	s.Yacht = point
+	s.IsFilledYacht = true
 	return nil
 }
 
@@ -158,9 +158,9 @@ func (s *Score) Point() int {
 			s.Choice,
 			s.FourOfAKind,
 			s.FullHouse,
-			s.SmallStraight,
+			s.LittleStraight,
 			s.BigStraight,
-			s.Yahtzee,
+			s.Yacht,
 		},
 	)
 }
@@ -177,9 +177,9 @@ func (s *Score) IsFilledAll() bool {
 			s.IsFilledChoice,
 			s.IsFilledFourOfAKind,
 			s.IsFilledFullHouse,
-			s.IsFilledSmallStraight,
+			s.IsFilledLittleStraight,
 			s.IsFilledBigStraight,
-			s.IsFilledYahtzee,
+			s.IsFilledYacht,
 		},
 		[]bool{false},
 	)
