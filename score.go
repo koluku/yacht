@@ -38,6 +38,37 @@ func NewScore() *Score {
 	return &Score{}
 }
 
+func (s *Score) Fill(yaku string, point int) error {
+	switch yaku {
+	case "Ace":
+		return s.FillAce(point)
+	case "Twos":
+		return s.FillTwos(point)
+	case "Threes":
+		return s.FillThrees(point)
+	case "Fours":
+		return s.FillFours(point)
+	case "Fives":
+		return s.FillFives(point)
+	case "Sixes":
+		return s.FillSixes(point)
+	case "Choice":
+		return s.FillChoice(point)
+	case "FourOfAKind":
+		return s.FillFourOfAKind(point)
+	case "FullHouse":
+		return s.FillFullHouse(point)
+	case "LittleStraight":
+		return s.FillLittleStraight(point)
+	case "BigStraight":
+		return s.FillBigStraight(point)
+	case "Yacht":
+		return s.FillYacht(point)
+	default:
+		return fmt.Errorf("そんな役無いよ")
+	}
+}
+
 func (s *Score) FillAce(point int) error {
 	if s.IsFilledAce {
 		return fmt.Errorf("既に埋めてあるよ")
@@ -183,4 +214,21 @@ func (s *Score) IsFilledAll() bool {
 		},
 		[]bool{false},
 	)
+}
+
+func (s *Score) FillableMap() map[string]bool {
+	fm := map[string]bool{}
+	fm["Ace"] = !s.IsFilledAce
+	fm["Twos"] = !s.IsFilledTwos
+	fm["Threes"] = !s.IsFilledThrees
+	fm["Fours"] = !s.IsFilledFours
+	fm["Fives"] = !s.IsFilledFives
+	fm["Sixes"] = !s.IsFilledSixes
+	fm["Choice"] = !s.IsFilledChoice
+	fm["FourOfAKind"] = !s.IsFilledFourOfAKind
+	fm["FullHouse"] = !s.IsFilledFullHouse
+	fm["LittleStraight"] = !s.IsFilledLittleStraight
+	fm["BigStraight"] = !s.IsFilledBigStraight
+	fm["Yacht"] = !s.IsFilledYacht
+	return fm
 }

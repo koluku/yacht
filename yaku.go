@@ -25,6 +25,23 @@ type Yaku struct {
 	Yacht          int
 }
 
+func (y *Yaku) ToMap() map[string]int {
+	yakuMap := map[string]int{}
+	yakuMap["Ace"] = y.Ace
+	yakuMap["Twos"] = y.Twos
+	yakuMap["Threes"] = y.Threes
+	yakuMap["Fours"] = y.Fours
+	yakuMap["Fives"] = y.Fives
+	yakuMap["Sixes"] = y.Sixes
+	yakuMap["Choice"] = y.Choice
+	yakuMap["FourOfAKind"] = y.FourOfAKind
+	yakuMap["FullHouse"] = y.FullHouse
+	yakuMap["LittleStraight"] = y.LittleStraight
+	yakuMap["BigStraight"] = y.BigStraight
+	yakuMap["Yacht"] = y.Yacht
+	return yakuMap
+}
+
 func (y *Yaku) Calculate(dices []int) {
 	y.Ace = Ace(dices)
 	y.Twos = Twos(dices)

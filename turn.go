@@ -51,17 +51,30 @@ func (p *Phase) Next() error {
 		p.MovePickPhase()
 		return nil
 	case PhaseTypePick:
-		if !p.CanMoveScoringPhase() {
-			return fmt.Errorf("サイコロを5つ決めていない場合はスコアを確定させることができない")
+		if p.CanMoveScoringPhase() {
+			p.MoveScoringPhase()
+			return nil
 		}
-		p.MoveScoringPhase()
-		return nil
+		if p.CanMoveRollPhase() {
+			p.MoveRollPhase()
+			return nil
+		}
+		return fmt.Errorf("ピック確定させて！！")
 	case PhaseTypeScoring:
 		p.MoveEndPhase()
 	case PhaseTypeEnd:
 		return fmt.Errorf("終わってるよ！！")
 	}
 	return nil
+}
+
+func (p *Phase) CanMoveRollPhase() bool {
+	if p.DiceBox.PickedNum() == 5 {
+		return false
+	} else if p.DiceBox.RolledTimes == 3 {
+		return false
+	}
+	return true
 }
 
 func (p *Phase) MoveRollPhase() {

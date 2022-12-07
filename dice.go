@@ -4,8 +4,6 @@ import (
 	"math/rand"
 	"sort"
 	"time"
-
-	"github.com/samber/lo"
 )
 
 type DiceStatus int
@@ -28,15 +26,13 @@ var (
 )
 
 type Dice struct {
-	ID     int
 	Number int
 	Emoji  string
 	Status DiceStatus
 }
 
-func NewDice(id int) *Dice {
+func NewDice() *Dice {
 	return &Dice{
-		ID:     id,
 		Status: DiceStatusReady,
 	}
 }
@@ -53,17 +49,21 @@ type Dices []*Dice
 
 func (ds Dices) Rolls() {
 	for _, dice := range ds {
-		if dice.Status != DiceStatusReady {
-			continue
+		if dice.Status == DiceStatusReady {
+			dice.Roll()
 		}
-		dice.Roll()
 	}
 }
 
-func (ds Dices) Picks(ids []int) {
-	for _, dice := range ds {
-		if lo.Contains(ids, dice.ID) {
-			dice.Status = DiceStatusPicked
+func (ds Dices) Picks(numbers []int) {
+	for _, number := range numbers {
+		for _, dice := range ds {
+			if dice.Status != DiceStatusRolled {
+				continue
+			}
+			if dice.Number == number {
+				dice.Status = DiceStatusPicked
+			}
 		}
 	}
 }
@@ -78,12 +78,43 @@ func (ds Dices) Clear() {
 	}
 }
 
-func (ds Dices) Open() []int {
+func (ds Dices) Readied() []int {
 	sort.Slice(ds, func(i, j int) bool {
 		return ds[i].Number < ds[j].Number
 	})
 	var numbers []int
 	for _, dice := range ds {
+		if dice.Status != DiceStatusReady {
+			continue
+		}
+		numbers = append(numbers, dice.Number)
+	}
+	return numbers
+}
+
+func (ds Dices) Rolled() []int {
+	sort.Slice(ds, func(i, j int) bool {
+		return ds[i].Number < ds[j].Number
+	})
+	var numbers []int
+	for _, dice := range ds {
+		if dice.Status != DiceStatusRolled {
+			continue
+		}
+		numbers = append(numbers, dice.Number)
+	}
+	return numbers
+}
+
+func (ds Dices) Picked() []int {
+	sort.Slice(ds, func(i, j int) bool {
+		return ds[i].Number < ds[j].Number
+	})
+	var numbers []int
+	for _, dice := range ds {
+		if dice.Status != DiceStatusPicked {
+			continue
+		}
 		numbers = append(numbers, dice.Number)
 	}
 	return numbers
@@ -97,7 +128,7 @@ type DiceBox struct {
 func NewDiceBox(num int) *DiceBox {
 	dices := Dices{}
 	for i := 0; i < num; i++ {
-		dices = append(dices, NewDice(i))
+		dices = append(dices, NewDice())
 	}
 	return &DiceBox{
 		Dices: dices,
