@@ -39,7 +39,7 @@ func NewDice() *Dice {
 
 func (d *Dice) Roll() {
 	rand.Seed(time.Now().UnixNano())
-	number := rand.Intn(5) + 1
+	number := rand.Intn(6) + 1
 	d.Number = number
 	d.Emoji = DiceEmojiMap[number]
 	d.Status = DiceStatusRolled
